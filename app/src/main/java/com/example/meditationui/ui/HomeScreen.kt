@@ -24,13 +24,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.meditationui.R
+import com.example.meditationui.data.BottomMenuContent
 import com.example.meditationui.data.Feature
 import com.example.meditationui.data.standardQuadFromTo
 import com.example.meditationui.ui.theme.*
 
-
-@Composable
 @ExperimentalFoundationApi
+@Composable
 fun HomeScreen() {
     Box(
         modifier = Modifier
@@ -41,38 +41,117 @@ fun HomeScreen() {
             GreetingSection()
             ChipSection(chips = listOf("Sweet sleep", "Insomnia", "Depression"))
             CurrentMeditation()
-            FeatureSection(features = listOf(
-                Feature(
-                    title = "Sleep meditation",
-                    R.drawable.ic_headphone,
-                    BlueViolet1,
-                    BlueViolet2,
-                    BlueViolet3
-                ),
-                Feature(
-                    title = "Tips for sleeping",
-                    R.drawable.ic_videocam,
-                    LightGreen1,
-                    LightGreen2,
-                    LightGreen3
-                ),
-                Feature(
-                    title = "Night island",
-                    R.drawable.ic_headphone,
-                    OrangeYellow1,
-                    OrangeYellow2,
-                    OrangeYellow3
-                ),
-                Feature(
-                    title = "Calming sounds",
-                    R.drawable.ic_headphone,
-                    Beige1,
-                    Beige2,
-                    Beige3
+            FeatureSection(
+                features = listOf(
+                    Feature(
+                        title = "Sleep meditation",
+                        R.drawable.ic_headphone,
+                        BlueViolet1,
+                        BlueViolet2,
+                        BlueViolet3
+                    ),
+                    Feature(
+                        title = "Tips for sleeping",
+                        R.drawable.ic_videocam,
+                        LightGreen1,
+                        LightGreen2,
+                        LightGreen3
+                    ),
+                    Feature(
+                        title = "Night island",
+                        R.drawable.ic_headphone,
+                        OrangeYellow1,
+                        OrangeYellow2,
+                        OrangeYellow3
+                    ),
+                    Feature(
+                        title = "Calming sounds",
+                        R.drawable.ic_headphone,
+                        Beige1,
+                        Beige2,
+                        Beige3
+                    )
                 )
-            ))
-            
+            )
         }
+        BottomMenu(items = listOf(
+            BottomMenuContent("Home", R.drawable.ic_home),
+            BottomMenuContent("Meditate", R.drawable.ic_bubble),
+            BottomMenuContent("Sleep", R.drawable.ic_moon),
+            BottomMenuContent("Music", R.drawable.ic_music),
+            BottomMenuContent("Profile", R.drawable.ic_profile),
+        ), modifier = Modifier.align(Alignment.BottomCenter))
+    }
+}
+
+@Composable
+fun BottomMenu(
+    items: List<BottomMenuContent>,
+    modifier: Modifier = Modifier,
+    activeHighlightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    initialSelectedItemIndex: Int = 0
+) {
+    var selectedItemIndex by remember {
+        mutableStateOf(initialSelectedItemIndex)
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(DeepBlue)
+            .padding(15.dp)
+    ) {
+        items.forEachIndexed { index, item ->
+            BottomMenuItem(
+                item = item,
+                isSelected = index == selectedItemIndex,
+                activeHighlightColor = activeHighlightColor,
+                activeTextColor = activeTextColor,
+                inactiveTextColor = inactiveTextColor
+            ) {
+                selectedItemIndex = index
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomMenuItem(
+    item: BottomMenuContent,
+    isSelected: Boolean = false,
+    activeHighlightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    onItemClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.clickable {
+            onItemClick()
+        }
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isSelected) activeHighlightColor else Color.Transparent)
+                .padding(10.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = item.iconId),
+                contentDescription = item.title,
+                tint = if (isSelected) activeTextColor else inactiveTextColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Text(
+            text = item.title,
+            color = if(isSelected) activeTextColor else inactiveTextColor
+        )
     }
 }
 
@@ -81,18 +160,18 @@ fun GreetingSection(
     name: String = "bobo wg"
 ) {
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(15.dp)
     ) {
         Column(
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "Good morning, $name",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineLarge,
                 color = TextWhite
             )
             Text(
@@ -119,7 +198,8 @@ fun ChipSection(
     }
     LazyRow {
         items(chips.size) {
-            Box(contentAlignment = Alignment.Center,
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .padding(start = 15.dp, top = 15.dp, bottom = 15.dp)
                     .clickable {
@@ -127,12 +207,12 @@ fun ChipSection(
                     }
                     .clip(RoundedCornerShape(10.dp))
                     .background(
-                        if (selectedChipIndex == it) ButtonBlue else DarkerButtonBlue
+                        if (selectedChipIndex == it) ButtonBlue
+                        else DarkerButtonBlue
                     )
-                    .padding(15.dp)) {
-                Text(
-                    text = chips[it], color = TextWhite
-                )
+                    .padding(15.dp)
+            ) {
+                Text(text = chips[it], color = TextWhite)
             }
         }
     }
@@ -155,8 +235,8 @@ fun CurrentMeditation(
         Column {
             Text(
                 text = "Daily Thought",
-                style = MaterialTheme.typography.headlineMedium,
-                color = TextWhite
+                style = MaterialTheme.typography.headlineLarge,
+                color = TextWhite,
             )
             Text(
                 text = "Meditation • 3-10 min",
@@ -184,19 +264,17 @@ fun CurrentMeditation(
 
 @ExperimentalFoundationApi
 @Composable
-fun FeatureSection(
-    features: List<Feature>
-) {
+fun FeatureSection(features: List<Feature>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Feature",
+            text = "Features",
             style = MaterialTheme.typography.headlineLarge,
             color = TextWhite,
             modifier = Modifier.padding(15.dp)
         )
         LazyVerticalGrid(
             cells = GridCells.Fixed(2),
-            contentPadding = PaddingValues(start = 7.5.dp, bottom = 100.dp),
+            contentPadding = PaddingValues(start = 7.5.dp, end = 7.5.dp, bottom = 100.dp),
             modifier = Modifier.fillMaxHeight()
         ) {
             items(features.size) {
@@ -275,9 +353,9 @@ fun FeatureItem(
         ) {
             Text(
                 text = feature.title,
-                style = MaterialTheme.typography.headlineLarge,
-                color = TextWhite,
+                style = MaterialTheme.typography.headlineMedium,
                 lineHeight = 26.sp,
+                color = TextWhite,
                 modifier = Modifier.align(Alignment.TopStart)
             )
             Icon(
